@@ -4,12 +4,12 @@ add_theme_support('custom-logo' );
 add_action('after_setup_theme', 'add_menu');
 
 function add_scripts_and_styles() {
-    wp_enqueue_script( 'jquery' ); // Подключаем jQuery, если ещё не подключен
+    wp_enqueue_script( 'jquery' ); 
     wp_enqueue_script( 'pages_pagimation', get_template_directory_uri() . '/assets/scripts/pages_pagimation.js', array('jquery'), null, true );
 
-    // Локализуем данные для работы с AJAX
+    
     wp_localize_script( 'pages_pagimation', 'ajax_obj', array(
-        'ajaxurl' => admin_url( 'admin-ajax.php' ) // URL для AJAX запросов
+        'ajaxurl' => admin_url( 'admin-ajax.php' ) 
     ));
     wp_enqueue_script( 'hamburger', get_template_directory_uri() . '/assets/scripts/hamburger.js', array(), null, true );
     wp_enqueue_style( 'fonts', get_template_directory_uri() . '/assets/css/fonts.css' );
@@ -91,9 +91,9 @@ function load_articles_callback() {
         echo '<p>Статьи не найдены.</p>';
     endif;
 
-    // Завершаем обработку запроса
+    
     wp_reset_postdata();
-    die(); // Завершаем обработку AJAX-запроса
+    die(); 
 }
 
 add_action( 'wp_ajax_load_articles', 'load_articles_callback' );
