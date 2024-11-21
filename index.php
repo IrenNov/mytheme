@@ -17,38 +17,59 @@ get_header(); ?>
             <h2 class="visually-hidden">Статьи</h2>
             <div class="content__container container">
                 <div class="articles">
-                    <ul class="articles__list">
-                        <?php 
-                        $loop = CFS()->get('article');
-                        $index = 0;
-                        foreach ($loop as $row) { 
-                            $index++;
-                            $position_in_group = $index % 11;
-                            $has_image = ($position_in_group === 4 || $position_in_group === 9);
+                    
+    <?php 
+    $args = array(
+        'post_type'      => 'post',
+        'posts_per_page' => -1, 
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    );
 
-                            $background_image = $has_image ? esc_url($row['article_fon']) : 'none';
+    $query = new WP_Query($args);
 
-                            $raw_date = isset($row['article_date']) ? $row['article_date'] : '';
-                            $formatted_date = $raw_date ? date_i18n('j F Y', strtotime($raw_date)) : '';
-                            $category = isset($row['category']) 
-    ? (is_array($row['category']) ? implode(', ', $row['category']) : $row['category']) 
-    : 'Без категории';
-                            ?>
-                                <li class="article-container" style="background-image: url(<?= $background_image ?>);">
-                                    <article class="articles__item">
-                                        <a class="category"><?= $category ?></a>
-                                        <a class="title">
-                                            <h3><?= $row['article_title'] ?></h3>
-                                        </a>
-                                        <p class="text"><?= $row['article_text'] ?></p>
-                                        <time class="date"><?= $formatted_date ?></time>
-                                    </article>
-                                </li>
-                            <?php
-                        }
-                        ?>
-                     
-                    </ul>
+    if ($query->have_posts()) : ?>
+        <ul class="articles__list"> 
+        <?php
+        $index = 0;
+        while ($query->have_posts()) : $query->the_post(); 
+        $index++;
+        $position_in_group = $index % 11;
+        $has_image = ($position_in_group === 4 || $position_in_group === 9);
+        $article_img = CFS()->get('article_fon'); 
+        $background_image = $has_image ? esc_url($article_img) : 'none';
+        
+        $article_text = CFS()->get('article_text');  
+
+        
+        $article_title = get_the_title(); 
+
+        
+        $article_text = $article_text ? $article_text : get_the_excerpt();  
+        ?>
+        <li class="article-container" <?php if ($background_image): ?>
+    style="background-image: url('<?= $background_image ?>');"
+<?php endif; ?>>
+            <article class="articles__item" >
+                <a class="category"><?= esc_html(get_the_category()[0]->name); ?></a>
+                <a class="title">
+                    <h3><?= esc_html($article_title); ?></h3>
+                </a>
+                <p class="text"><?= esc_html($article_text); ?></p>
+                <time class="date"><?= get_the_date('j F Y'); ?></time>
+            </article>
+        </li>
+    <?php 
+    endwhile; ?>
+    </ul> 
+    <?php
+    wp_reset_postdata();
+else : 
+    echo '<p>Записей пока нет.</p>';
+endif;
+?>
+
+                    
                     <div id="pagination" class="articles-pagination"></div>
                     <button class="show-more-btn form-btn visible-mobile">
                         <span class="button-text">Показать еще 6</span>
@@ -63,34 +84,59 @@ get_header(); ?>
                     <h3 class="aside__title">
                         Популярные новости
                     </h3>
-                    <ul class="aside__list">
-                        <?php
-                            $articles = CFS()->get('article');
 
-                            if (!empty($articles) && is_array($articles)) {
-                                
-                                $recent_articles = array_slice($articles, -3); 
-                                foreach (array_reverse($recent_articles) as $article) { 
-                                    $title = isset($article['article_title']) ? $article['article_title'] : 'Без заголовка';
-                                    $date_raw = isset($article['article_date']) ? $article['article_date'] : '';
-                                    $date_formatted = $date_raw ? date_i18n('j F Y', strtotime($date_raw)) : 'Без даты';
-                                    $link = isset($article['article_link']) ? esc_url($article['article_link']) : '#'; 
-                                    ?>
-                                    <li class="aside__item">
-                                        <a href="<?= $link; ?>">
-                                            <h4 class="aside__item-title"><?= esc_html($title); ?></h4>
-                                            <time class="aside__item-date date"><?= esc_html($date_formatted); ?></time>
-                                        </a>
-                                    </li>
-                                    <hr>
-                                    <?php
-                                }
-                            } else {
-                                echo '<p>Нет доступных статей</p>';
-                            }
-                        ?>
- 
-                    </ul>
+                    <ul class="aside__list">
+    <?php
+   $args = array(
+    'post_type'      => 'post',
+    'posts_per_page' => -1, 
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+);
+
+$query = new WP_Query($args);
+
+$popular_articles = array();
+
+if ($query->have_posts()) :
+    while ($query->have_posts()) : $query->the_post();
+
+        
+        $is_popular = CFS()->get('article_popular');
+
+        if ($is_popular) { 
+            $popular_articles[] = array(
+                'title' => get_the_title(),
+                'link'  => get_permalink(),
+                'date'  => get_the_date('j F Y'),
+            );
+        }
+
+    endwhile;
+
+    
+    $popular_articles = array_slice($popular_articles, -3);
+
+    foreach (array_reverse($popular_articles) as $article) {
+        ?>
+        <li class="aside__item">
+            <a href="<?= esc_url($article['link']); ?>">
+                <h4 class="aside__item-title"><?= esc_html($article['title']); ?></h4>
+                <time class="aside__item-date date"><?= esc_html($article['date']); ?></time>
+            </a>
+        </li>
+        <hr>
+        <?php
+    }
+
+    wp_reset_postdata();
+else :
+    echo '<p>Нет доступных популярных статей</p>';
+endif;
+
+    ?>
+</ul>
+
                     <div class="subscribe subscribe-container">
                         <h3 class="subscribe__title blog-title">Подписка на рассылку</h3>
                         <?php
