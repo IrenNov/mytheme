@@ -256,7 +256,7 @@ svg * {
   }
 }
 
-.current {
+.current-menu-item {
   color: var(--color-accent);
   text-decoration: underline;
 }
@@ -641,12 +641,12 @@ p, .date {
   gap: min(2.78vw, 40px);
 }
 @media (hover: hover) {
-  .header .nav__item:hover {
+  .header .nav__list li:hover {
     color: var(--color-accent);
   }
 }
 @media (hover: none) {
-  .header .nav__item:active {
+  .header .nav__list li:active {
     color: var(--color-accent);
   }
 }
@@ -705,6 +705,7 @@ p, .date {
 @media (max-width: 480px) {
   .header .phone {
     margin-right: 30px;
+    margin-left: auto;
   }
 }
 @media (max-width: 480px) {
@@ -997,6 +998,10 @@ p, .date {
   display: flex;
   flex-direction: column;
   gap: 9px;
+  
+}
+.aside__list hr:last-of-type {
+  display: none;
 }
 @media (max-width: 480px) {
   .aside__list {

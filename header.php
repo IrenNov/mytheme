@@ -14,9 +14,19 @@
         <div class="container">
             <?php the_custom_logo( ); ?>
             <nav class="nav header__nav">
-                <ul class="nav__list">
+                <?php 
+                wp_nav_menu([
+                    'theme_location' => 'top', 
+                    'container' => 'nav', 
+                    'container_class' => 'nav__list', 
+                    'menu_class' => 'nav__list', 
+                    'menu_id' => '', 
+                ]);
+                ?>
+                
+                 <!-- <ul class="nav__list">
                     <li class="nav__item">
-                        <a href="<?php get_home_url(); ?>" class="nav__link current">Главная</a>
+                        <a href="<?= get_home_url(); ?>" class="nav__link current">Главная</a>
                     </li>
                     <li class="nav__item">
                         <a href="#" class="nav__link">О нас</a>
@@ -28,7 +38,7 @@
                         <a href="#" class="nav__link search-link">Поиск</a>
                     </li>
 
-                </ul>
+                </ul>  -->
             </nav>
             <a href="tel:+798788787" class="phone">
                 <svg width="14" height="15" viewBox="0 0 14 15" fill="#5D71DD" xmlns="http://www.w3.org/2000/svg">
